@@ -25,7 +25,7 @@
 | M6 | CSRF (Password Change) | routes/changePassword.ts | Doğru Pozitif | CWE-352 | 6.5 | GET isteğiyle şifre değiştirme tetiklendi, Anti-CSRF token yok |
 | M7 | LFI / Vulnerable Components | routes/fileServer.ts | Doğru Pozitif | CWE-22 | 7.5 | Null byte (%00) ile uzantı doğrulaması atlatılabiliyor |
 | M8 | Mass Assignment (Admin Register) | routes/register.ts, models/User.ts | Doğru Pozitif | CWE-915 | 8.1 | Body'deki role:"admin" filtrelenmeden create()'e geçiyor |
-| M9 | XXE (B2B Order Processing) | routes/b2bOrder.ts | Doğru Pozitif | CWE-611 | 8.2 | libxmljs parser'da noent:true, external entity resolution açık |
+| M9 | Code Injection/RCE (B2B Order Processing) | routes/b2bOrder.ts | Doğru Pozitif | CWE-94 | 8.2 | vm.runInContext ile kullanıcı girdisi (orderLinesData) JavaScript kodu olarak çalıştırılıyordu; sandbox escape ile process.exit() gibi tehlikeli komutlar çalıştırılabiliyordu. (Not: İlk triyajda "XXE" olarak yanlış sınıflandırılmıştı, kod incelemesinde gerçek zafiyetin XML ile ilgisi olmadığı tespit edildi.) |
 | M10 | Open Redirect | routes/redirect.ts | Doğru Pozitif | CWE-601 | 4.7 | to parametresi whitelist kontrolünden geçmiyor |
 
 ---
@@ -50,7 +50,7 @@
 | SQL Injection | routes/login.ts:34 | Doğru Pozitif | CWE-89 | 9.8 | M2 ile aynı bulgu — SAST + manuel çakışması |
 | SQL Injection | routes/search.ts:23 | Doğru Pozitif | CWE-89 | 9.1 | Parametresiz sequelize.query, arama kutusundan tetiklenebilir |
 | Property Injection | routes/currentUser.ts:31 | Doğru Pozitif | CWE-915 | 6.5 | requestedFields üzerinden mass assignment / hassas alan sızıntısı riski |
-| String Concat (Injection) | routes/userProfile.ts:61 | Doğru Pozitif | CWE-89 | 8.6 | Kod string concatenation ile sorgu kuruyor |
+| Eval Injection/SSTI | routes/userProfile.ts | Doğru Pozitif | CWE-95 | 8.6 | Username alanına #{...} formatında değer girilirse eval() ile JavaScript kodu olarak çalıştırılıyordu. (Not: İlk triyajda "String Concat Injection/CWE-89" olarak yanlış sınıflandırılmıştı, kod incelemesinde gerçek zafiyetin eval() tabanlı kod enjeksiyonu olduğu tespit edildi.) |
 | CTF Challenge Kodu (4 adet) | data/static/codefixes/*.ts | Kabul Edilebilir Risk | CWE-89 | 3.1 (düşürülmüş) | Kod, uygulamanın çalışan route akışında import edilmiyor; sadece "hangi satır güvensiz" CTF sorusu için statik referans metni olarak sunuluyor (routes/vulnCodeFixes.ts üzerinden okunuyor, execute edilmiyor) |
 | CI/CD Shell Injection (5 adet) | .github/workflows/ci.yml:358, update-challenges-*.yml | Doğru Pozitif (ayrı kategori) | CWE-78 | 8.8 | GitHub Actions workflow'unda güvensiz shell/curl-pipe kullanımı; pipeline güvenliği kapsamında ayrıca ele alınacak |
 | Secret Detection (JWT, test dosyaları — 3 adet) | app.guard.spec.ts:46, last-login-ip.component.spec.ts:72/78 | Yalancı Pozitif | - | - | Gitleaks Grup 1 ile aynı gerekçe — test mock verisi |
