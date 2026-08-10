@@ -1,0 +1,28 @@
+rules:
+  - id: no-raw-sequelize-query
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >
+      Parametresiz (raw/string concatenation ile kurulmus) Sequelize sorgusu 
+      tespit edildi. models.sequelize.query() icinde template literal (backtick) 
+      kullanarak degisken birlestirmek, SQL Injection (CWE-89) zafiyetine yol 
+      acar. Bunun yerine 'replacements' parametresi ile parametreli sorgu 
+      kullanilmalidir. Bu proje daha once routes/login.ts ve routes/search.ts 
+      dosyalarinda tam olarak bu zafiyeti iceriyordu (bkz. fix/sql-injection-login 
+      ve fix/sql-injection-search PR'lari).
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      owasp: "A03:2021 - Injection"
+      references:
+        - "https://cwe.mitre.org/data/definitions/89.html"
+      custom-rule: true
+      related-remediation: "fix/sql-injection-login, fix/sql-injection-search"
+    patterns:
+      - pattern: '$SEQUELIZE.query(`...${$VAR}...`, ...)'
+      - pattern-not: '$SEQUELIZE.query(`...${$VAR}...`, { replacements: {...}, ... })'
+    paths:
+      exclude:
+        - "**/test/**"
+        - "*.spec.ts"
+        - "*.test.ts"
+        - "**/node_modules/**"
