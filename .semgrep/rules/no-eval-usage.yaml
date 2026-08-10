@@ -1,0 +1,28 @@
+rules:
+  - id: no-eval-usage
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >
+      Tehlikeli eval() kullanimi tespit edildi. eval() fonksiyonu, kendisine 
+      verilen string'i JavaScript kodu olarak calistirir. Eger bu string 
+      kullanici girdisinden (req.body, req.query, req.params vb.) geliyorsa, 
+      bu bir Code Injection / RCE (CWE-95) zafiyetidir. Bu proje daha once 
+      routes/userProfile.ts dosyasinda tam olarak bu zafiyeti iceriyordu 
+      (bkz. fix/eval-injection-userprofile PR'i). NOT: Veri kaynagi kullanici 
+      girdisi degilse (orn. sunucu tarafinda uretilen sabit/rastgele deger), 
+      bu bulgu yalanci pozitif olabilir, manuel kontrol gerekir.
+    metadata:
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
+      owasp: "A03:2021 - Injection"
+      references:
+        - "https://cwe.mitre.org/data/definitions/95.html"
+      custom-rule: true
+      related-remediation: "fix/eval-injection-userprofile"
+    patterns:
+      - pattern: eval(...)
+    paths:
+      exclude:
+        - "**/test/**"
+        - "*.spec.ts"
+        - "*.test.ts"
+        - "**/node_modules/**"
