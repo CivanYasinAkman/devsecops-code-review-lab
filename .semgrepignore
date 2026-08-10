@@ -1,0 +1,17 @@
+# Yalancı pozitif / kabul edilebilir risk olarak triyaj edilmiş yollar
+# Detaylar icin bkz: triyaj-tablosu.md
+
+# CTF challenge kodu - gercek uygulama akisinda calismiyor, sadece egitim amacli statik referans
+juice-shop/data/static/codefixes/**
+
+# Test dosyalari - mock/ornek veri iceriyor, uretim kodu degil
+**/test/**
+**/*.spec.ts
+**/*.test.ts
+
+# Juice Shop'un kendi orijinal CI/CD dosyalari - bizim remediation kapsamimizin disinda,
+# ayri bir pipeline guvenligi konusu olarak triyaj-tablosunda not edildi
+juice-shop/.github/workflows/**
+
+# node_modules - ucuncu parti kod, SCA araclariyla (npm audit, Trivy) ayrica taraniyor
+**/node_modules/**
